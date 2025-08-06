@@ -693,7 +693,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'text/plain, application/json'
                         },
                         body: JSON.stringify({
                             query: message,
@@ -704,21 +704,34 @@
                             conversationHistory: conversationHistory
                         }),
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log("Response status:", response.status);
+                        console.log("Response headers:", response.headers.get('content-type'));
+                        
+                        // Check if response is JSON or text
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json();
+                        } else {
+                            return response.text();
+                        }
+                    })
                     .then(data => {
                         console.log("Received response:", data);
+                        console.log("Response type:", typeof data);
                         
-                        // Handle your specific n8n response format
+                        // Handle different response formats
                         let responseText = null;
                         
-                        if (data && data.response) {
+                        if (typeof data === 'string') {
+                            // Direct text response from n8n
+                            responseText = data;
+                        } else if (data && data.response) {
                             responseText = data.response;
                         } else if (data && data.aiResponse) {
                             responseText = data.aiResponse;
                         } else if (data && data.text) {
                             responseText = data.text;
-                        } else if (data && typeof data === 'string') {
-                            responseText = data;
                         }
                         
                         if (responseText) {
