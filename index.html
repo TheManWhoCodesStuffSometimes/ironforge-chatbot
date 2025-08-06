@@ -707,16 +707,25 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log("Received response:", data);
-                        if (data && data.aiResponse) {
-                            addBotMessage(data.aiResponse);
-                        } else if (data && data.response) {
-                            addBotMessage(data.response);
+                        
+                        // Handle your specific n8n response format
+                        let responseText = null;
+                        
+                        if (data && data.response) {
+                            responseText = data.response;
+                        } else if (data && data.aiResponse) {
+                            responseText = data.aiResponse;
                         } else if (data && data.text) {
-                            addBotMessage(data.text);
+                            responseText = data.text;
+                        } else if (data && typeof data === 'string') {
+                            responseText = data;
+                        }
+                        
+                        if (responseText) {
+                            addBotMessage(responseText);
                         } else {
-                            setTimeout(() => {
-                                addBotMessage("I've received your message but I'm having trouble processing it. Please try again or contact us directly at the Uplink Robotics website.");
-                            }, 500);
+                            console.log("Unexpected response format:", data);
+                            addBotMessage("I've received your message but I'm having trouble processing it. Please try again or contact us directly at the Uplink Robotics website.");
                         }
                     })
                     .catch(error => {
