@@ -131,12 +131,21 @@
 
         .bot-message {
             background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-            color: #FFFFFF;
+            color: #FFFFFF !important;
             border: 1px solid #6AD972;
             border-top-left-radius: 4px;
             align-self: flex-start;
             margin-left: 35px;
             box-shadow: 0 2px 8px rgba(106, 217, 114, 0.1);
+        }
+
+        .bot-message * {
+            color: #FFFFFF !important;
+        }
+
+        .bot-message strong {
+            color: #6AD972 !important;
+            font-weight: bold;
         }
 
         .bot-message::before {
@@ -164,18 +173,43 @@
             box-shadow: 0 2px 8px rgba(106, 217, 114, 0.2);
         }
 
-        .typing-indicator {
+        .loading-message {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 12px;
             padding: 12px 16px;
             background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
             border: 1px solid #6AD972;
             border-radius: 16px;
             border-top-left-radius: 4px;
-            max-width: 70px;
             align-self: flex-start;
             margin-left: 35px;
+            color: #FFFFFF;
+            font-size: 14px;
+            max-width: 280px;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        .loading-message::before {
+            content: "🤖";
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            background-color: #6AD972;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .typing-indicator span {
@@ -395,10 +429,18 @@
                 font-size: 14px;
             }
 
-            .typing-indicator {
+            .loading-message {
                 margin-left: 25px;
                 padding: 10px 14px;
-                max-width: 60px;
+                max-width: 250px;
+                font-size: 13px;
+            }
+
+            .loading-message::before {
+                left: -22px;
+                width: 20px;
+                height: 20px;
+                font-size: 14px;
             }
 
             .typing-indicator span {
@@ -491,11 +533,11 @@
             }
 
             .bot-message::before,
-            .typing-indicator {
+            .loading-message::before {
                 display: none;
             }
 
-            .typing-indicator {
+            .loading-message {
                 margin-left: 0;
                 align-self: flex-start;
             }
@@ -563,6 +605,22 @@
             
             const MAX_CONTEXT_MESSAGES = 10;
             
+            // Fun loading messages for robotics theme
+            const loadingMessages = [
+                "Engaging magnetic stabilizers…",
+                "Calibrating ultra-spidey vision…",
+                "Beaming instructions to Marten…",
+                "Scouting crawlspace coordinates…",
+                "Charging nanobot coffee supply…",
+                "Synchronizing sensor arrays…",
+                "Polishing crawler treads…",
+                "Diagnosing ductwork anomalies…"
+            ];
+            
+            let loadingMessageIndex = Math.floor(Math.random() * loadingMessages.length);
+            let currentLoadingElement = null;
+            let loadingInterval = null;
+            
             // Suggested questions for Uplink Robotics
             const suggestions = [
                 "What robotics solutions does Uplink offer?",
@@ -623,27 +681,64 @@
                 scrollToBottom();
             }
 
+            // Start loading animation with rotating messages
+            function startLoadingAnimation() {
+                currentLoadingElement = document.createElement('div');
+                currentLoadingElement.className = 'loading-message';
+                currentLoadingElement.id = 'loading-message';
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = loadingMessages[loadingMessageIndex];
+                
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+                
+                currentLoadingElement.appendChild(textSpan);
+                currentLoadingElement.appendChild(typingIndicator);
+                
+                chatMessages.appendChild(currentLoadingElement);
+                scrollToBottom();
+                
+                // Rotate through loading messages every 1.5 seconds
+                loadingInterval = setInterval(() => {
+                    loadingMessageIndex = (loadingMessageIndex + 1) % loadingMessages.length;
+                    textSpan.textContent = loadingMessages[loadingMessageIndex];
+                }, 1500);
+            }
+
+            // Stop loading animation
+            function stopLoadingAnimation() {
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    loadingInterval = null;
+                }
+                
+                if (currentLoadingElement) {
+                    chatMessages.removeChild(currentLoadingElement);
+                    currentLoadingElement = null;
+                }
+            }
+
             // Add bot message
             function addBotMessage(text) {
+                // If we're starting a loading state
+                if (text === "loading") {
+                    startLoadingAnimation();
+                    return;
+                }
+                
+                // Stop any existing loading animation
+                stopLoadingAnimation();
+                
                 const messageElement = document.createElement('div');
                 messageElement.className = 'message bot-message';
                 
-                if (text === "loading") {
-                    messageElement.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-                    messageElement.id = 'loading-message';
-                    messageElement.className = 'typing-indicator';
-                } else {
-                    const loadingMessage = document.getElementById('loading-message');
-                    if (loadingMessage) {
-                        chatMessages.removeChild(loadingMessage);
-                    }
-                    
-                    // Process markdown-style formatting
-                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    text = text.replace(/\n/g, '<br>');
-                    
-                    messageElement.innerHTML = text;
-                }
+                // Process markdown-style formatting
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/\n/g, '<br>');
+                
+                messageElement.innerHTML = text;
                 
                 chatMessages.appendChild(messageElement);
                 scrollToBottom();
@@ -743,6 +838,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        stopLoadingAnimation();
                         addBotMessage("Sorry, I'm having trouble connecting right now. Please try again later or visit our website for immediate assistance.");
                     });
                 }
