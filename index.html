@@ -739,9 +739,19 @@
                 const messageElement = document.createElement('div');
                 messageElement.className = 'message bot-message';
                 
-                // Since backend already processes the HTML formatting, use it directly
-                // Only do minimal cleanup if needed
-                messageElement.innerHTML = text;
+                // Safely handle the HTML content from backend
+                // Replace <br> tags with line breaks for proper display within the bubble
+                let processedText = text
+                    .replace(/<br\s*\/?>/gi, '\n')
+                    .replace(/<br><br>/gi, '\n\n')
+                    .replace(/<strong>(.*?)<\/strong>/gi, '<strong>$1</strong>');
+                
+                // Now convert back to HTML for display
+                processedText = processedText
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/\n/g, '<br>');
+                
+                messageElement.innerHTML = processedText;
                 
                 chatMessages.appendChild(messageElement);
                 scrollToBottom();
