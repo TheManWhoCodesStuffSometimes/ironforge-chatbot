@@ -8,7 +8,11 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/images/(.*)",
+      "continue": true
+    },
+    {
+      "src": "/((?!images/).*)",
       "dest": "/index.html"
     }
   ]
