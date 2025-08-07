@@ -569,6 +569,14 @@
                 chatInput.style.height = 'auto';
                 chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
             }
+            // Add user message bubble
+            function appendUserMessage(text) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message user-message';
+                messageElement.textContent = text;
+                chatMessages.appendChild(messageElement);
+                scrollToBottom();
+            }
 
             // Start loading animation with rotating messages
             function startLoadingAnimation() {
@@ -698,7 +706,7 @@
                 if (message) {
                     hideSuggestions();
                     
-                    addUserMessage(message);
+                    appendUserMessage(message);
                     chatInput.value = '';
                     adjustInputHeight();
                     
