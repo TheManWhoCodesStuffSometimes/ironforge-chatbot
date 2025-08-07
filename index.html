@@ -506,22 +506,18 @@
                 headerMartin.src = '/images/martin-thinking.png';
                 
                 // Update all existing martin avatars to thinking
-                            const martinAvatars = document.querySelectorAll('.bot-message .message-avatar img, .loading-message .message-avatar img');
-                martinAvatars.forEach(img => {
-                    img.src = '/images/martin-thinking.png';
-                });
-            }
+                const loadingAvatarImg = document.querySelector('.loading-message .message-avatar img');
+                  if (loadingAvatarImg) loadingAvatarImg.src = '/images/martin-thinking.png';
+                }
 
             function setMartinNormal() {
                 isThinking = false;
                 headerMartin.src = '/images/martin-normal.png';
                 
                 // Update all existing martin avatars to normal
-                const martinAvatars = document.querySelectorAll('.bot-message .message-avatar img, .loading-message .message-avatar img');
-                martinAvatars.forEach(img => {
-                    img.src = '/images/martin-normal.png';
-                });
-            }
+                const latestBotAvatarImg = [...document.querySelectorAll('.bot-message .message-avatar img')].pop();
+                  if (latestBotAvatarImg) latestBotAvatarImg.src = '/images/martin-normal.png';
+                }
 
             // Create Martin avatar element
             function createMartinAvatar() {
@@ -639,6 +635,7 @@
                 // If we're starting a loading state
                 if (text === "loading") {
                     startLoadingAnimation();
+                    removeAllChatAvatars();
                     return;
                 }
                 
@@ -700,6 +697,11 @@
                 
                 return history;
             }
+            function removeAllChatAvatars() {
+                  // Remove avatars from any existing bot or loading messages
+                  chatMessages.querySelectorAll('.bot-message .message-avatar, .loading-message .message-avatar')
+                    .forEach(el => el.remove());
+                }
 
             // Send message
             function sendMessage() {
@@ -710,6 +712,8 @@
                     addUserMessage(message);
                     chatInput.value = '';
                     adjustInputHeight();
+                    
+                    removeAllChatAvatars();
                     
                     addBotMessage("loading");
                     
