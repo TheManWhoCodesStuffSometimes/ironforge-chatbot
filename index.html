@@ -144,9 +144,9 @@
             color: #FFFFFF;
             border: 1px solid #6AD972;
             border-radius: 16px;
-            border-bottom-left-radius: 4px; /* << moved flat corner down here */
+            border-bottom-left-radius: 4px; /* flat corner bottom-left */
             align-self: flex-start;
-            margin-left: 68px; /* more space for larger avatar */
+            margin-left: 76px; /* extra space for larger avatar */
             box-shadow: 0 2px 8px rgba(106, 217, 114, 0.1);
         }
         
@@ -167,11 +167,11 @@
         /* ====== BIGGER & LOWERED AVATAR ====== */
         .message-avatar {
             position: absolute;
-            left: -56px;              /* account for wider avatar + a small gap */
-            top: 62%;                 /* push the avatar slightly below center */
+            left: -64px;            /* shift to match bubble gap */
+            top: 92%;               /* lower so top-right of circle nearly touches bubble’s bottom-left */
             transform: translateY(-50%);
-            width: 56px;
-            height: 56px;
+            width: 64px;            /* bigger than 56px */
+            height: 64px;
             border-radius: 50%;
             background-color: #6AD972;
             padding: 3px;
@@ -506,7 +506,7 @@
                 headerMartin.src = '/images/martin-thinking.png';
                 
                 // Update all existing martin avatars to thinking
-                const martinAvatars = document.querySelectorAll('.message-avatar img');
+                            const martinAvatars = document.querySelectorAll('.bot-message .message-avatar img, .loading-message .message-avatar img');
                 martinAvatars.forEach(img => {
                     img.src = '/images/martin-thinking.png';
                 });
@@ -517,7 +517,7 @@
                 headerMartin.src = '/images/martin-normal.png';
                 
                 // Update all existing martin avatars to normal
-                const martinAvatars = document.querySelectorAll('.message-avatar img');
+                const martinAvatars = document.querySelectorAll('.bot-message .message-avatar img, .loading-message .message-avatar img');
                 martinAvatars.forEach(img => {
                     img.src = '/images/martin-normal.png';
                 });
@@ -644,6 +644,11 @@
                 
                 // Stop any existing loading animation
                 stopLoadingAnimation();
+                // Remove avatars from all previous bot messages
+                const oldBotMessages = chatMessages.querySelectorAll('.bot-message .message-avatar');
+                if (oldBotMessages.length > 0) {
+                    oldBotMessages.forEach(avatar => avatar.remove());
+                }
                 
                 const messageElement = document.createElement('div');
                 messageElement.className = 'message bot-message';
