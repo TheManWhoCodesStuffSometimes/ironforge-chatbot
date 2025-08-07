@@ -637,12 +637,12 @@
             // Martin state management
             function setMartinThinking() {
                 isThinking = true;
-                headerMartin.src = 'images/martin-thinking.png';
+                headerMartin.src = '/images/martin-thinking.png';
                 
                 // Update all existing martin avatars to thinking
                 const martinAvatars = document.querySelectorAll('.message-avatar img');
                 martinAvatars.forEach(img => {
-                    img.src = 'images/martin-thinking.png';
+                    img.src = '/images/martin-thinking.png';
                 });
             }
 
