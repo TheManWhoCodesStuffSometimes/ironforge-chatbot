@@ -56,8 +56,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
             flex-shrink: 0;
+            padding: 3px;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
         }
 
         .logo-text h1 {
@@ -153,20 +160,27 @@
             font-weight: bold;
         }
 
-        .bot-message::before {
-            content: "🤖";
+        .message-avatar {
             position: absolute;
             left: -30px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 16px;
-            background-color: #6AD972;
             width: 24px;
             height: 24px;
             border-radius: 50%;
+            background-color: #6AD972;
+            padding: 2px;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .user-message {
@@ -193,22 +207,7 @@
             font-size: 14px;
             max-width: 280px;
             animation: messageSlideIn 0.3s ease-out;
-        }
-
-        .loading-message::before {
-            content: "🤖";
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            background-color: #6AD972;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative;
         }
 
         .typing-indicator {
@@ -395,7 +394,7 @@
             .logo-icon {
                 width: 35px;
                 height: 35px;
-                font-size: 16px;
+                padding: 2px;
             }
 
             .logo-text h1 {
@@ -427,11 +426,11 @@
                 margin-left: 25px;
             }
 
-            .bot-message::before {
+            .message-avatar {
                 left: -22px;
                 width: 20px;
                 height: 20px;
-                font-size: 14px;
+                padding: 1px;
             }
 
             .loading-message {
@@ -439,13 +438,6 @@
                 padding: 10px 14px;
                 max-width: 250px;
                 font-size: 13px;
-            }
-
-            .loading-message::before {
-                left: -22px;
-                width: 20px;
-                height: 20px;
-                font-size: 14px;
             }
 
             .typing-indicator span {
@@ -537,8 +529,7 @@
                 margin-left: 0;
             }
 
-            .bot-message::before,
-            .loading-message::before {
+            .message-avatar {
                 display: none;
             }
 
@@ -560,10 +551,12 @@
         <!-- Header -->
         <div class="header">
             <div class="logo-section">
-                <div class="logo-icon">🤖</div>
+                <div class="logo-icon">
+                    <img src="images/martin-normal.png" alt="Martin" id="header-martin">
+                </div>
                 <div class="logo-text">
                     <h1>Uplink Robotics</h1>
-                    <p>AI Assistant</p>
+                    <p>AI Assistant - Martin</p>
                 </div>
             </div>
             <button class="website-button" onclick="window.open('https://www.uplinkrobotics.com', '_blank')">
@@ -604,6 +597,7 @@
             const chatInput = document.getElementById('chat-input');
             const sendButton = document.getElementById('send-button');
             const suggestionsContainer = document.getElementById('suggestionsContainer');
+            const headerMartin = document.getElementById('header-martin');
             
             // Updated webhook URL
             const webhookUrl = 'https://thayneautomations.app.n8n.cloud/webhook/Uplink-Robotics-Chatbot-message-received';
@@ -625,6 +619,7 @@
             let loadingMessageIndex = Math.floor(Math.random() * loadingMessages.length);
             let currentLoadingElement = null;
             let loadingInterval = null;
+            let isThinking = false;
             
             // Suggested questions for Uplink Robotics
             const suggestions = [
@@ -635,9 +630,45 @@
                 "What makes Uplink Robotics different?"
             ];
 
+            // Martin state management
+            function setMartinThinking() {
+                isThinking = true;
+                headerMartin.src = 'images/martin-thinking.png';
+                
+                // Update all existing martin avatars to thinking
+                const martinAvatars = document.querySelectorAll('.message-avatar img');
+                martinAvatars.forEach(img => {
+                    img.src = 'images/martin-thinking.png';
+                });
+            }
+
+            function setMartinNormal() {
+                isThinking = false;
+                headerMartin.src = 'images/martin-normal.png';
+                
+                // Update all existing martin avatars to normal
+                const martinAvatars = document.querySelectorAll('.message-avatar img');
+                martinAvatars.forEach(img => {
+                    img.src = 'images/martin-normal.png';
+                });
+            }
+
+            // Create Martin avatar element
+            function createMartinAvatar() {
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                
+                const img = document.createElement('img');
+                img.src = isThinking ? 'images/martin-thinking.png' : 'images/martin-normal.png';
+                img.alt = 'Martin';
+                
+                avatar.appendChild(img);
+                return avatar;
+            }
+
             // Initialize chat
             function initializeChat() {
-                addBotMessage("Welcome to Uplink Robotics! 🤖 I'm here to help you learn about our cutting-edge robotics solutions and how we can transform your operations. What would you like to know?");
+                addBotMessage("Welcome to Uplink Robotics! 🤖 I'm Martin, your AI assistant here to help you learn about our cutting-edge robotics solutions and how we can transform your operations. What would you like to know?");
                 createSuggestions();
             }
 
@@ -688,9 +719,15 @@
 
             // Start loading animation with rotating messages
             function startLoadingAnimation() {
+                setMartinThinking();
+                
                 currentLoadingElement = document.createElement('div');
                 currentLoadingElement.className = 'loading-message';
                 currentLoadingElement.id = 'loading-message';
+                
+                // Add Martin avatar to loading message
+                const avatar = createMartinAvatar();
+                currentLoadingElement.appendChild(avatar);
                 
                 const textSpan = document.createElement('span');
                 textSpan.textContent = loadingMessages[loadingMessageIndex];
@@ -723,6 +760,8 @@
                     chatMessages.removeChild(currentLoadingElement);
                     currentLoadingElement = null;
                 }
+                
+                setMartinNormal();
             }
 
             // Add bot message
@@ -739,6 +778,10 @@
                 const messageElement = document.createElement('div');
                 messageElement.className = 'message bot-message';
                 
+                // Add Martin avatar to bot message
+                const avatar = createMartinAvatar();
+                messageElement.appendChild(avatar);
+                
                 // Safely handle the HTML content from backend
                 // Replace <br> tags with line breaks for proper display within the bubble
                 let processedText = text
@@ -751,7 +794,7 @@
                     .replace(/\n\n/g, '<br><br>')
                     .replace(/\n/g, '<br>');
                 
-                messageElement.innerHTML = processedText;
+                messageElement.innerHTML = avatar.outerHTML + processedText;
                 
                 chatMessages.appendChild(messageElement);
                 scrollToBottom();
