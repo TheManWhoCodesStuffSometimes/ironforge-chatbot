@@ -552,7 +552,7 @@
         <div class="header">
             <div class="logo-section">
                 <div class="logo-icon">
-                    <img src="https://via.placeholder.com/45x45/6AD972/000000?text=M" alt="Martin" id="header-martin">
+                    <div id="header-martin" style="width: 100%; height: 100%; background: #6AD972; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 18px;">M</div>
                 </div>
                 <div class="logo-text">
                     <h1>Uplink Robotics</h1>
@@ -658,11 +658,11 @@
                 const avatar = document.createElement('div');
                 avatar.className = 'message-avatar';
                 
-                const img = document.createElement('img');
-                img.src = isThinking ? 'images/martin-thinking.png' : 'images/martin-normal.png';
-                img.alt = 'Martin';
+                const placeholder = document.createElement('div');
+                placeholder.style.cssText = 'width: 100%; height: 100%; background: #6AD972; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 12px;';
+                placeholder.textContent = 'M';
                 
-                avatar.appendChild(img);
+                avatar.appendChild(placeholder);
                 return avatar;
             }
 
