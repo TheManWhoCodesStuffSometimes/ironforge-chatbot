@@ -502,22 +502,18 @@
 
             // Martin state management
             function setMartinThinking() {
-                isThinking = true;
-                headerMartin.src = '/images/martin-thinking.png';
-                
-                // Update all existing martin avatars to thinking
-                const loadingAvatarImg = document.querySelector('.loading-message .message-avatar img');
-                  if (loadingAvatarImg) loadingAvatarImg.src = '/images/martin-thinking.png';
-                }
-
+              isThinking = true;
+              // only the loading bubble's avatar should change
+              const loadingAvatarImg = document.querySelector('.loading-message .message-avatar img');
+              if (loadingAvatarImg) loadingAvatarImg.src = '/images/martin-thinking.png';
+            }
+            
             function setMartinNormal() {
-                isThinking = false;
-                headerMartin.src = '/images/martin-normal.png';
-                
-                // Update all existing martin avatars to normal
-                const latestBotAvatarImg = [...document.querySelectorAll('.bot-message .message-avatar img')].pop();
-                  if (latestBotAvatarImg) latestBotAvatarImg.src = '/images/martin-normal.png';
-                }
+              isThinking = false;
+              // only the newest bot bubble's avatar should change
+              const latestBotAvatarImg = [...document.querySelectorAll('.bot-message .message-avatar img')].pop();
+              if (latestBotAvatarImg) latestBotAvatarImg.src = '/images/martin-normal.png';
+            }
 
             // Create Martin avatar element
             function createMartinAvatar() {
@@ -574,14 +570,21 @@
                 chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
             }
 
-            // Add user message
-            function addUserMessage(text) {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message user-message';
-                messageElement.textContent = text;
-                chatMessages.appendChild(messageElement);
-                scrollToBottom();
-            }
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message bot-message';
+            
+            // Add Martin avatar to bot message
+            const avatarEl = createMartinAvatar();
+            messageElement.appendChild(avatarEl);
+            
+            // Safely handle the HTML content from backend (you already built `processedText`)
+            const contentEl = document.createElement('div');
+            contentEl.className = 'bot-message-content';
+            contentEl.innerHTML = processedText;
+            
+            messageElement.appendChild(contentEl);
+            chatMessages.appendChild(messageElement);
+
 
             // Start loading animation with rotating messages
             function startLoadingAnimation() {
