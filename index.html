@@ -570,22 +570,6 @@
                 chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
             }
 
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message bot-message';
-            
-            // Add Martin avatar to bot message
-            const avatarEl = createMartinAvatar();
-            messageElement.appendChild(avatarEl);
-            
-            // Safely handle the HTML content from backend (you already built `processedText`)
-            const contentEl = document.createElement('div');
-            contentEl.className = 'bot-message-content';
-            contentEl.innerHTML = processedText;
-            
-            messageElement.appendChild(contentEl);
-            chatMessages.appendChild(messageElement);
-
-
             // Start loading animation with rotating messages
             function startLoadingAnimation() {
                 setMartinThinking();
@@ -654,24 +638,26 @@
                 messageElement.className = 'message bot-message';
                 
                 // Add Martin avatar to bot message
-                const avatar = createMartinAvatar();
-                messageElement.appendChild(avatar);
+                const avatarEl = createMartinAvatar();
+                messageElement.appendChild(avatarEl);
                 
-                // Safely handle the HTML content from backend
-                // Replace <br> tags with line breaks for proper display within the bubble
+                // Prepare processed text
                 let processedText = text
-                    .replace(/<br\s*\/?>/gi, '\n')
-                    .replace(/<br><br>/gi, '\n\n')
-                    .replace(/<strong>(.*?)<\/strong>/gi, '<strong>$1</strong>');
-                
-                // Now convert back to HTML for display
+                  .replace(/<br\s*\/?>/gi, '\n')
+                  .replace(/<br><br>/gi, '\n\n')
+                  .replace(/<strong>(.*?)<\/strong>/gi, '<strong>$1</strong>');
                 processedText = processedText
-                    .replace(/\n\n/g, '<br><br>')
-                    .replace(/\n/g, '<br>');
+                  .replace(/\n\n/g, '<br><br>')
+                  .replace(/\n/g, '<br>');
                 
-                messageElement.innerHTML = avatar.outerHTML + processedText;
+                // Add a content wrapper so we don’t blow away the avatar
+                const contentEl = document.createElement('div');
+                contentEl.className = 'bot-message-content';
+                contentEl.innerHTML = processedText;
+                messageElement.appendChild(contentEl);
                 
                 chatMessages.appendChild(messageElement);
+
                 scrollToBottom();
             }
 
